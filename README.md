@@ -39,5 +39,5 @@ Fixed Fraction(%): 20.0, CAR25(%): 2.164
 
 Navigate to `http://localhost:8001/eq` in your web browser to check the simulated equity curves:
 ```
-
+![figure1](screen/eqcurve.PNG "")
 ```

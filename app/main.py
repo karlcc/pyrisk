@@ -2,15 +2,33 @@ import pandas_datareader as pdr
 import numpy as np
 import datetime
 import bisect
-from config import *
-from apikey import *
 from flask import Flask, render_template
+import os
+import json
+# Get the current directory
+current_dir = os.getcwd()
+
+# Specify the file name
+file_name = "api.json"
+
+# Construct the file path using os.path.join()
+file_path = os.path.join(current_dir, file_name)
+with open(file_path) as f:
+    config = json.load(f)
+apikey = config['api']['key']
+debug = False
+issue = 'spy'
+data_source = 'av-daily-adjusted'
+fromdate = '2019-1-1'
+todate = '2021-1-1'
+
 class risknreward:
     def getTrades(self, data:str, remoterefresh:bool) -> np.array:
         filename = "trades.csv"
+        file_path = os.path.join(current_dir, filename)
         pnl = np.array([])
         try:
-            pnl = np.loadtxt(filename, delimiter=",")
+            pnl = np.loadtxt(file_path, delimiter=",")
             if debug and 1+1 == 3:
                 print("Trades array: ")
                 print(pnl)
@@ -121,10 +139,13 @@ class risknreward:
 app = Flask(__name__)
 @app.route('/eq')
 def chart():
-   
-    # Generate data for each line  
+    risknrewardtest =  risknreward()
+    datasource = "remote"
+    remoterefresh = False       
     pnl = risknrewardtest.getTrades(datasource,remoterefresh)
     result = risknrewardtest.calCAR(pnl)
+    
+    # Generate data for each line 
     num_lines = 3
     labels = list(range(1, pnl.size+1))
     data = []
@@ -144,6 +165,11 @@ def chart():
 
 @app.route('/', methods=['GET', 'POST'])
 def hello():
+    risknrewardtest =  risknreward()
+    datasource = "remote"
+    remoterefresh = False       
+    pnl = risknrewardtest.getTrades(datasource,remoterefresh)
+    result = risknrewardtest.calCAR(pnl)
     head = f"Stock: {issue}<br>Periods: {fromdate} to {todate}"
     return f"{head}<br>Fixed Fraction(%): {result['safef']:.1f}, CAR25(%): {result['car25']:.3f}"
     
