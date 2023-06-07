@@ -31,7 +31,7 @@ CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS        
 
 After the application starts, navigate to `http://localhost:8001` in your web browser or run:
 ```
-$ curl localhost:8000
+$ curl localhost:8001
 Stock: spy
 Periods: 2019-1-1 to 2021-1-1
 Fixed Fraction(%): 20.0, CAR25(%): 2.164
