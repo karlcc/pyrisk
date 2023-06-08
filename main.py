@@ -16,7 +16,7 @@ file_path = os.path.join(current_dir, file_name)
 with open(file_path) as f:
     config = json.load(f)
 apikey = config['api']['key']
-debug = False
+debug = True
 issue = 'spy'
 data_source = 'av-daily-adjusted'
 fromdate = '2019-1-1'
@@ -137,6 +137,10 @@ class risknreward:
         return {'safef':safef,'car25':car25,'eq':data}
     
 app = Flask(__name__)
+@app.route('/')
+def index():
+    return "Index Page"
+
 @app.route('/eq')
 def chart():
     risknrewardtest =  risknreward()
@@ -163,8 +167,8 @@ def chart():
         num_lines=num_lines
     )
 
-@app.route('/', methods=['GET', 'POST'])
-def hello():
+@app.route('/result', methods=['GET', 'POST'])
+def result():
     risknrewardtest =  risknreward()
     datasource = "remote"
     remoterefresh = False       
@@ -173,14 +177,14 @@ def hello():
     head = f"Stock: {issue}<br>Periods: {fromdate} to {todate}"
     return f"{head}<br>Fixed Fraction(%): {result['safef']:.1f}, CAR25(%): {result['car25']:.3f}"
     
-if __name__ == '__main__':
-    risknrewardtest =  risknreward()
-    datasource = "remote"
-    remoterefresh = False
-    pnl = risknrewardtest.getTrades(datasource,remoterefresh)
+#if __name__ == '__main__':
+    #risknrewardtest =  risknreward()
+    #datasource = "remote"
+    #remoterefresh = False
+    #pnl = risknrewardtest.getTrades(datasource,remoterefresh)
     #print("pnl is ", pnl) # Output: list of pnl
     
-    result = risknrewardtest.calCAR(pnl)
+    #result = risknrewardtest.calCAR(pnl)
     #print(f"Fixed Fraction(%): {result['safef']:.1f}, CAR25(%): {result['car25']:.3f}")
     
-    app.run()
+#    app.run()

@@ -161,3 +161,4 @@ cython_debug/
 
 apikey.py
 api.json
+config.py
