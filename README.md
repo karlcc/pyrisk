@@ -7,10 +7,16 @@ Project structure:
 .
 ├── Dockerfile
 ├── requirements.txt
-├── app
-    ├── apikey.py
-    ├── config.py
-    └── main.py
+├── instance
+├── riskch
+    ├── static
+    ├── templates
+    ├── __init__.py
+    ├── chart.py
+    ├── compute.py
+    ├── db.py
+    ├── mpool.py
+    └── schema.sql
 
 ```
 
@@ -29,18 +35,17 @@ CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS        
 78e6c069e2f3   pyrisk    "flask --app app.mai…"   7 seconds ago   Up 4 seconds   0.0.0.0:8001->8001/tcp   optimistic_meninsky
 ```
 
-After the application starts, navigate to `http://localhost:8001` in your web browser or run:
-```
-$ curl localhost:8001
-Stock: spy
-Periods: 2019-1-1 to 2021-1-1
-Fixed Fraction(%): 20.0, CAR25(%): 2.164
-```
+After the web application starts, navigate to `http://localhost:8001` in your web browser:
 
-Navigate to `http://localhost:8001/eq` in your web browser to check the simulated equity curves:
-```
-```
-![figure1](screen/eqcurve.PNG "")
+![index](screen/index.PNG "")
+![add](screen/add.PNG "")
+![edit](screen/edit.PNG "")
+
+At the first page, you can add, edit, delete and compute the perform metric. For demo, I typical select CAR25 from the book of Dr. Howard Bandy - Quantitative Technical Analysist.
+
+Click on the Equity Curve to check the 10 equally likely equity curves from the Monte Carlos simulation:
+
+![eqcurve](screen/eqcurve.PNG "")
 
 ## Debug related commands
 

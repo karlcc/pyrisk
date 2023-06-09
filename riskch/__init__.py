@@ -38,8 +38,11 @@ def create_app(test_config=None):
     db.init_app(app)
 
     from riskch import compute
- 
     from riskch import mpool
+    from riskch import chart
+    
     app.register_blueprint(mpool.bp)
+    app.register_blueprint(chart.bp)
+    
     app.add_url_rule('/', endpoint='index')
     return app

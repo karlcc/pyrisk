@@ -2,6 +2,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
 from werkzeug.exceptions import abort
+import json
 
 from riskch.db import get_db
 from riskch.compute import getTrades, calCAR
@@ -132,4 +133,18 @@ def sim(id):
             (result['car25'], id)
         )
         db.commit()
+        id =int(id)
+        db.execute(
+            'DELETE FROM eq_safef WHERE issue_id = ?',(id,)
+        )        
+        db.commit()
+        
+        list_data = result['eq']
+        for curve in list_data:
+            json_str = json.dumps(curve)
+            db.execute(
+                'INSERT INTO eq_safef (issue_id, curve) VALUES (?, ?)', 
+                (id, json_str))
+        db.commit()
+        
     return redirect(url_for('mpool.index'))
