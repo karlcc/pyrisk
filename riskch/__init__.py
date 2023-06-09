@@ -9,12 +9,15 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY="dev",
         API_KEY="dev",
+        SOURCE="dev",
         DATABASE=os.path.join(app.instance_path, 'data.sqlite'),
+        CSVTMP=os.path.join(app.instance_path, 'trades.csv'),
+        DEBUG=True,
     )
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
+        app.config.from_pyfile('config.py', silent=False )
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)
@@ -32,6 +35,11 @@ def create_app(test_config=None):
     
     # register the database commands
     from riskch import db
-
     db.init_app(app)
+
+    from riskch import compute
+ 
+    from riskch import mpool
+    app.register_blueprint(mpool.bp)
+    app.add_url_rule('/', endpoint='index')
     return app

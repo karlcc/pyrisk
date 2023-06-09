@@ -41,3 +41,15 @@ Navigate to `http://localhost:8001/eq` in your web browser to check the simulate
 ```
 ```
 ![figure1](screen/eqcurve.PNG "")
+
+## Debug related commands
+
+Run The Application
+```
+flask --app riskch run --debug
+```
+
+Initialize the Database File
+```
+flask --app riskch init-db
+```

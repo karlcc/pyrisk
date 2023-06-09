@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Pool{% endblock %}</h1>
+    <a class="action" href="{{ url_for('mpool.create') }}">New</a>
+{% endblock %}
+
+{% block content %}
+
+<article class="issue">
+  <div class="container">
+    <div class="name"></div>
+    <div class="title">CAR25: </div>
+    <div class="title">From: </div>
+    <div class="title">To: </div>
+    <div class="edit"></div>
+  </div> 
+  <hr>
+</article>
+  {% for issue in issues %}
+    <article class="issue">
+      <div class="container">
+        <div class="name">{{ issue['issue'] }}</div>
+        <div class="data">{{ issue['car25'] }}
+          <a class="action" href="{{ url_for('mpool.sim', id=issue['id']) }}">sim</a>
+        </div>
+        <div class="data">{{ issue['fromdate'] }}</div>
+        <div class="data">{{ issue['todate'] }}</div>
+        <div class="edit">      
+          <a class="action" href="{{ url_for('mpool.update', id=issue['id']) }}">Edit</a>
+        </div>
+      </div> 
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+{% endblock %}
