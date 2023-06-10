@@ -1,8 +1,10 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for, current_app
 )
+from flask import jsonify
 from werkzeug.exceptions import abort
 import json
+import requests
 
 from riskch.db import get_db
 from riskch.compute import getTrades, calCAR, calPnl_fixfrac, calCCxy
@@ -19,13 +21,41 @@ def index():
     ).fetchall()
     return render_template('mpool/index.html', issues=issues)
 
+@bp.route('/search')
+def searchindex():
+    issue = None
+    return redirect(url_for("mpool.search"))
+
+@bp.route('/<string:issue>/search', methods=('GET', 'POST'))
+def search(issue):
+    data = ""
+    if request.method == 'POST':
+        issue = request.form['issue']
+    error = None
+    base_url = 'https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='
+    apikey = current_app.config["API_KEY"]
+    url = f"{base_url}{issue}&apikey={apikey}"
+    
+    if not issue:
+        error = 'Issue is required.'
+        
+    if error is None:
+        try:
+            r = requests.get(url)
+            data = r.json()
+            formatted_data = json.dumps(data, indent=1)
+            return render_template('mpool/search.html', formatted_data=formatted_data, issue=issue)
+        except requests.exceptions.RequestException as e:
+            error = f"An error occurred: {str(e)}"
+            return render_template('mpool/search.html', issue=issue)
+    return render_template('mpool/search.html', issue=issue)
+
 @bp.route('/create', methods=('GET', 'POST'))
 def create():
     if request.method == 'POST':
         issue = request.form['issue']
         fromdate = request.form['from_date']
         todate = request.form['to_date']
-        #car25 = 0
         error = None
 
         if not issue:
@@ -37,7 +67,6 @@ def create():
                 db.execute(
                     'INSERT INTO marketpool (issue, fromdate, todate)'
                     ' VALUES (?, ?, ?)',
-                    #(issue, fromdate, todate, car25)
                     (issue, fromdate, todate, )
                 )
                 db.commit()

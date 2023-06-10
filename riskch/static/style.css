@@ -102,7 +102,7 @@ nav ul li a, nav ul li span, header .action {
 
 .issue .func {
   color: #044586;
-  flex: 0 0 400px;
+  flex: 0 0 350px;
 }
 
 .content:last-child {
@@ -136,4 +136,8 @@ input.danger {
 input[type=submit] {
   align-self: start;
   min-width: 10em;
+}
+
+pre {
+  white-space: pre-wrap;
 }

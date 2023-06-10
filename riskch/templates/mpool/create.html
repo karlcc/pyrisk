@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
+  <a class="action" href="{{ url_for('mpool.searchindex') }}">Search Symbol</a>
   <form method="post">
     <label for="issue">Issue</label>
     <input name="issue" id="issue" value="{{ request.form['issue'] }}" required>

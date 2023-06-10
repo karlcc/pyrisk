@@ -29,7 +29,8 @@ def simchart(id):
     result = db.execute(
         'SELECT curve'
         ' FROM eq_safef'
-        ' WHERE issue_id = ? LIMIT ?',
+        ' WHERE issue_id = ?'
+        ' ORDER BY RANDOM() LIMIT ?',
         (id,num_lines,)
     ).fetchall()
     
