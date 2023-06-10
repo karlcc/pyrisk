@@ -13,6 +13,8 @@
         var labels = {{ labels | tojson }};
         var data = {{ data | tojson }};
         var numLines = {{ num_lines }};
+        // Array of 10 unique colors
+        var uniqueColors = ["red", "blue", "green", "yellow", "orange", "purple", "pink", "teal", "brown", "gray"];
 
         var datasets = [];
         for (var i = 0; i < numLines; i++) {
@@ -20,7 +22,7 @@
                 label: 'Line ' + (i + 1),
                 data: data[i],
                 fill: false,
-                borderColor: getRandomColor(),
+                borderColor: uniqueColors[i % uniqueColors.length],
                 tension: 0.1
             };
             datasets.push(dataset);

@@ -23,8 +23,8 @@ def index():
 
 @bp.route('/search')
 def searchindex():
-    issue = None
-    return redirect(url_for("mpool.search"))
+    issue = "spy"
+    return redirect(url_for("mpool.search",issue=issue))
 
 @bp.route('/<string:issue>/search', methods=('GET', 'POST'))
 def search(issue):
