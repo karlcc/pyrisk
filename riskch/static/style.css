@@ -100,6 +100,11 @@ nav ul li a, nav ul li span, header .action {
   flex: 0 0 50px;
 }
 
+.issue .func {
+  color: #044586;
+  flex: 0 0 400px;
+}
+
 .content:last-child {
   margin-bottom: 0;
 }

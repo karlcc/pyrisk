@@ -5,7 +5,7 @@ from werkzeug.exceptions import abort
 import json
 
 from riskch.db import get_db
-from riskch.compute import getTrades, calCAR
+from riskch.compute import getTrades, calCAR, calPnl_fixfrac, calCCxy
 
 bp = Blueprint('mpool', __name__)
 
@@ -25,7 +25,7 @@ def create():
         issue = request.form['issue']
         fromdate = request.form['from_date']
         todate = request.form['to_date']
-        car25 = 0
+        #car25 = 0
         error = None
 
         if not issue:
@@ -35,9 +35,10 @@ def create():
             db = get_db()
             try:
                 db.execute(
-                    'INSERT INTO marketpool (issue, fromdate, todate, car25)'
-                    ' VALUES (?, ?, ?, ?)',
-                    (issue, fromdate, todate, car25)
+                    'INSERT INTO marketpool (issue, fromdate, todate)'
+                    ' VALUES (?, ?, ?)',
+                    #(issue, fromdate, todate, car25)
+                    (issue, fromdate, todate, )
                 )
                 db.commit()
             except db.IntegrityError:
@@ -61,9 +62,23 @@ def get_issue(id,):
 
     return oneissue
 
+def get_issue_name(issue,):
+    oneissue = get_db().execute(
+        'SELECT *'
+        ' FROM marketpool m'
+        ' WHERE m.issue = ?',
+        (issue,)
+    ).fetchone()
+
+    if oneissue is None:
+        abort(404, f"Issue name {issue} doesn't exist.")
+
+    return oneissue
+
 @bp.route('/<int:id>/update', methods=('GET', 'POST'))
 def update(id):
     oneissue = get_issue(id)
+    preissue = oneissue["issue"]
 
     if request.method == 'POST':
         issue = request.form['issue']
@@ -77,12 +92,21 @@ def update(id):
         if error is None:
             db = get_db()
             try:
-                db.execute(
-                    'UPDATE marketpool SET issue = ?, fromdate = ?, todate = ?'
-                    ' WHERE id = ?',
-                    (issue, fromdate, todate, id)
-                )
+                if issue != preissue:
+                    # clear previous computation results
+                    db.execute(
+                        'UPDATE marketpool SET issue = ?, fromdate = ?, todate = ?, car25 = 0.0, safef = 0.0'
+                        ' WHERE id = ?',
+                        (issue, fromdate, todate, id)
+                    )                    
+                else:
+                    db.execute(
+                        'UPDATE marketpool SET issue = ?, fromdate = ?, todate = ?'
+                        ' WHERE id = ?',
+                        (issue, fromdate, todate, id)
+                    )
                 db.commit()
+                
             except db.IntegrityError:
                 error = f"Issue {issue} is already in the pool."
             else:
@@ -112,39 +136,80 @@ def sim(id):
     fromdate = oneissue['fromdate']
     todate = oneissue['todate']
     error = None
+    f = 0
 
     if fromdate is None or todate is None:
         error = "Time period is required."
 
     try:
-        pnl = getTrades(oneissue, datasource, remoterefresh)
+        trades = getTrades(oneissue, datasource, remoterefresh)
+        pnl_d = trades["pnl_d"]
+        close_d = trades["close_d"]
     except Exception as e:
         error = str(e)
     else:
-        result = calCAR(pnl,oneissue)
-        
+        result = calCAR(pnl_d,oneissue)
+        f = int(result['safef'])
+        pnl = calPnl_fixfrac(pnl_d,oneissue,f)
+  
     if error is not None:
         flash(error)
     else:
         db = get_db()
+        # update car25, safef
         db.execute(
-            'UPDATE marketpool SET car25 = ?'
+            'UPDATE marketpool SET car25 = ?, safef = ?'
             ' WHERE id = ?',
-            (result['car25'], id)
+            (result['car25'], f, id)
         )
-        db.commit()
         id =int(id)
+        # delete previous simulation curves
         db.execute(
             'DELETE FROM eq_safef WHERE issue_id = ?',(id,)
         )        
-        db.commit()
-        
+        # insert new simulation curves
         list_data = result['eq']
         for curve in list_data:
             json_str = json.dumps(curve)
             db.execute(
                 'INSERT INTO eq_safef (issue_id, curve) VALUES (?, ?)', 
                 (id, json_str))
-        db.commit()
+
+        # delete previous histogram
+        db.execute(
+            'DELETE FROM hist WHERE issue_id = ?',(id,)
+        ) 
+
+        # insert histogram and trade curve at safe
+        tradeno = 0
+        for element in pnl:
+            if tradeno == 0:
+                db.execute(
+                    'INSERT INTO hist (issue_id, trade_id, close_d, retrun_d, pnl)'
+                    'VALUES (?, ?, ?, ?, ?)', 
+                    (id, tradeno, close_d[tradeno], 0, element)
+                )  
+            else:
+                db.execute(
+                    'INSERT INTO hist (issue_id, trade_id, close_d, retrun_d, pnl)'
+                    'VALUES (?, ?, ?, ?, ?)', 
+                    (id, tradeno, close_d[tradeno], pnl_d[tradeno-1], element)
+                )
+            tradeno += 1
+            
+        # Retrieve pnl bench id 1
+        benchmark_name = "spy"
+        oneissue_bench = get_issue_name(benchmark_name)
+        pnl_bench = db.execute('SELECT pnl FROM hist WHERE issue_id = ?', (oneissue_bench["id"],)).fetchall()
+        pnl_bench_list = [row[0] for row in pnl_bench]
+        correlation = calCCxy(pnl,pnl_bench_list)
+        # update correlation to benchmark
+        db.execute(
+            'UPDATE marketpool SET cor2bench = ?'
+            ' WHERE id = ?',
+            (correlation, id)
+        )
         
+        db.commit()
+
     return redirect(url_for('mpool.index'))

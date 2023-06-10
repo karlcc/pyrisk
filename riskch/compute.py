@@ -4,7 +4,7 @@ import datetime
 import bisect
 from flask import current_app
 
-def getTrades(oneissue:dict, data:str="local", remoterefresh:bool=False) -> np.array:
+def getTrades(oneissue:dict, data:str="local", remoterefresh:bool=False) -> dict:
     file_path = current_app.config["CSVTMP"]
     data_source = current_app.config["SOURCE"]
     apikey = current_app.config["API_KEY"]
@@ -39,7 +39,7 @@ def getTrades(oneissue:dict, data:str="local", remoterefresh:bool=False) -> np.a
         pnl = (qtC[1:] - qtC[:-1]) / qtC[:-1]     
         np.savetxt(file_path, pnl, fmt="%f", delimiter=",")
                 
-    return pnl
+    return {'pnl_d':pnl,'close_d':qtC}
 
 def calCAR(pnl:np.array, oneissue:dict) -> dict:
     debug = current_app.config["DEBUG"]
@@ -124,3 +124,33 @@ def calCAR(pnl:np.array, oneissue:dict) -> dict:
         
     # calculate base eq curve
     return {'safef':safef,'car25':car25,'eq':data}
+
+def calPnl_fixfrac(pnl_d:np.array, oneissue:dict, f:int) -> list:
+    debug = current_app.config["DEBUG"]    
+    count = pnl_d.size
+    if count == 0:
+        return False
+    # Calculate account balance current sequence of trades
+    equity = 1
+    equityhigh = equity
+    ddmax = 0
+    pnl = [1]       
+    for i in range(count):
+        newequity = equity * (1+(f/100*(pnl_d[i])))
+        # Calculate closed trade percent drawdown
+        if (newequity > equityhigh):
+            equityhigh = newequity
+        else:
+            dd = (equityhigh - newequity) / equityhigh
+            if (dd > ddmax):
+                ddmax = dd
+        equity = newequity
+        pnl.append(equity)
+
+    return pnl
+
+def calCCxy(x:list, y:list) -> float:
+    # Compute correlation coefficient
+    correlation_matrix = np.corrcoef(x, y)
+    correlation = correlation_matrix[0, 1]
+    return correlation

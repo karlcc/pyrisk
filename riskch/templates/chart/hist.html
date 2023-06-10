@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>10 equally likely equity curves</title>
+    <title>{{ oneissue["issue"] }} - equity curve</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>10 equally likely equity curves</h1>
+    <h1>{{ oneissue["issue"] }} at {{ oneissue["safef"] }} % fixed fractional - equity curve</h1>
+    <a>{{ oneissue["fromdate"] }} - {{ oneissue["todate"] }}</a>
     <canvas id="myChart" width="400" height="200"></canvas>
 
     <script>
