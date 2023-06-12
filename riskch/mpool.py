@@ -227,17 +227,23 @@ def sim(id):
             tradeno += 1
             
         # Retrieve pnl bench id 1
-        benchmark_name = "spy"
-        oneissue_bench = get_issue_name(benchmark_name)
-        pnl_bench = db.execute('SELECT pnl FROM hist WHERE issue_id = ?', (oneissue_bench["id"],)).fetchall()
-        pnl_bench_list = [row[0] for row in pnl_bench]
-        correlation = calCCxy(pnl,pnl_bench_list)
-        # update correlation to benchmark
-        db.execute(
-            'UPDATE marketpool SET cor2bench = ?'
-            ' WHERE id = ?',
-            (correlation, id)
-        )
+        #benchmark_name = "spy"
+        oneissue_benchid = 1
+        #oneissue_bench = get_issue_name(benchmark_name)
+        
+        try:
+            pnl_bench = db.execute('SELECT pnl FROM hist WHERE issue_id = ?', (oneissue_benchid,)).fetchall()
+            pnl_bench_list = [row[0] for row in pnl_bench]
+            correlation = calCCxy(pnl,pnl_bench_list)
+            # update correlation to benchmark
+            db.execute(
+                'UPDATE marketpool SET cor2bench = ?'
+                ' WHERE id = ?',
+                (correlation, id)
+            )
+        except Exception as e:
+            error = str(e)
+            flash(error)
         
         db.commit()
 

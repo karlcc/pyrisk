@@ -149,7 +149,17 @@ def calPnl_fixfrac(pnl_d:np.array, oneissue:dict, f:int) -> list:
 
     return pnl
 
+def truncate_lists(list1, list2):
+    if len(list1) > len(list2):
+        list1 = list1[:len(list2)]
+    elif len(list2) > len(list1):
+        list2 = list2[:len(list1)]
+    
+    return list1, list2
+
 def calCCxy(x:list, y:list) -> float:
+    x, y = truncate_lists(x, y)
+    
     # Compute correlation coefficient
     correlation_matrix = np.corrcoef(x, y)
     correlation = correlation_matrix[0, 1]

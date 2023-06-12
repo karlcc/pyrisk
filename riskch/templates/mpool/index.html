@@ -26,7 +26,7 @@
         <div class="name">{{ issue['issue'] }}</div>
         <div class="data">{{ "%.2f"|format(issue['car25']) }}</div>
         <div class="data">{{ "%.1f"|format(issue['safef']) }}</div>
-        <div class="data">{{ "%.1f"|format(issue['cor2bench']) }}</div>
+        <div class="data">{{ "%.2f"|format(issue['cor2bench']) }}</div>
         <div class="func">
           <a class="action" href="{{ url_for('mpool.sim', id=issue['id']) }}">Compute</a>
           {% if issue['car25'] != 0 %}
