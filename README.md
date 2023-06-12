@@ -43,11 +43,11 @@ After the web application starts, navigate to `http://localhost:8001` in your we
 
 At the first page, you can add, edit, delete and compute the perform metric. For demo, I typical select CAR25 from the book of Dr. Howard Bandy - Quantitative Technical Analysist. Also compute the Correlation coefficient to the market, preset to "spy".
 
-Click on the Equity Curve to check the 10 equally likely equity curves from the Monte Carlos simulation:
+* Click on the Equity Curve to check the 10 equally likely equity curves from the Monte Carlos simulation:
 
 ![eqcurve](screen/eqcurve.PNG "")
 
-Equity Curve at Safe F.
+* Equity Curve at Safe F.
 
 ![history](screen/history.PNG "")
 
