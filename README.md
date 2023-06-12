@@ -57,6 +57,12 @@ CAR25 is a conservative metric that can be used to compare alternative uses of f
 
 SAFEF is the fixed fractional position size at the trade system.
 
+## Assumptions and Limitations
+
+During calculation, assume:
+* the postion sizing can be more 100% of account, maximum is 400%,
+* 
+
 ## Debug related commands
 
 Run The Application
