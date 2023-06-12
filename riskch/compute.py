@@ -78,8 +78,11 @@ def calCAR(pnl:np.array, oneissue:dict) -> dict:
             ddmax = 0
             line = [1]         
             for i in range(count):
-                newequity = equity * (1+(f/100*(randtrades[i])))
-                
+                #newequity = equity * (1+(f/100*(randtrades[i])))
+                hold = equity * (f/100)
+                profit = hold * randtrades[i]
+                cash = equity - hold
+                newequity = hold + profit + cash
                 # Calculate closed trade percent drawdown
                 if (newequity > equityhigh):
                     equityhigh = newequity
