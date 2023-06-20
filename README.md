@@ -55,14 +55,14 @@ At the first page, you can add, edit, delete and compute the perform metric. For
 
 CAR25 is a conservative metric that can be used to compare alternative uses of funds.  It is the compound annual rate of return for the risk normalized profit at the 25th percentile of the distribution
 
-SAFEF is the fixed fractional position size at the trade system.
+SAFEF is the fixed percentage position size at the trade system.
 
 ## Assumptions and Limitations
 
 During calculation, assume:
 * the position sizing can be more 100% of account, maximum is 400%,
 * 0 interest rate,
-* buy with fixed fractional position sizing every trades r everydays,
+* buy with fixed percentage position sizing every trades r everydays,
 * commission omit
 
 ## Debug related commands
