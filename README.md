@@ -62,7 +62,7 @@ SAFEF is the fixed percentage position size at the trade system.
 During calculation, assume:
 * the position sizing can be more 100% of account, maximum is 400%,
 * 0 interest rate,
-* buy with fixed percentage position sizing every trades r everydays,
+* buy with fixed percentage position sizing every trades everydays,
 * commission omit
 
 ## Debug related commands
